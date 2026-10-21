@@ -2,7 +2,10 @@
 title: "SOCI 502 Data Story"
 author: "Jena Benson"
 date: "October 17, 2026"
-format: pdf
+format: html
+bibliography: bibliography.bib
+nocite: |
+  @*
 ---
 
 # MILESTONE 1: QUESTION AND SIMULATION
@@ -11,13 +14,22 @@ Do Canadian men and women choose different commuting modes and if so, does this
 gender difference vary by province/territory?
 
 ## Dataset: 
-The dataset that I have selected is Table 98-10-0458-01 from the 2021 Canadian 
-Census. This dataset includes information on Canadians' choice of commuting 
-mode, duration of commute, time leaving for work, age, and gender, categorized 
-by province/territory. 
+The dataset that I have selected is Table 98-10-0458-01 [@MainModeofCommuting] 
+from the 2021 Canadian Census. This dataset includes information on Canadians' 
+choice of commuting mode, duration of commute, time leaving for work, age, and 
+gender, categorized by province/territory. 
 
 ## Plans for Data Story:
+I plan to compare transit use of Canadian men and women across all 13 provinces 
+and territories in Canada to see if there are patterns that can be identified, 
+when comparing transit use with total commuters in each province.
 
+I hypothesize that women across each province will have higher transit use rates
+than their male counterparts, and that the provinces with the highest rates of 
+transit use will be large provinces with sophisticated transit networks. This
+will be proven if Women+ transit rates across the 13 Canadian provinces and
+territories are greater than those of Men+ and if transit rates are highest
+within "large_tier" provinces and lowest within "small_tier" provinces.
 
 ## Simulated Code and Data:
 
@@ -26,7 +38,7 @@ by province/territory.
 
 #### Workspace Setup #### 
 
-# install.packages("tidyverse")
+# install.packages("tidyverse") 
 # install.packages("dplyr")
 # install.packages("knitr")
 # install.packages("tinytable")
@@ -75,11 +87,14 @@ sim_grid
 
 large_tier <- c("Quebec", "Ontario", "British Columbia")
 medium_tier <- c("Nova Scotia", "Manitoba", "Alberta")
+small_tier <- c("Yukon", "Northwest Territories", "Nunavut", 
+                "Prince Edward Island", "Newfoundland and Labrador", 
+                "Saskatchewan", "New Brunswick")
 
 base_p <- case_when(
   provinces %in% large_tier  ~ 0.08, 
   provinces %in% medium_tier ~ 0.04, 
-  TRUE                       ~ 0.02
+  provinces %in% small_tier  ~ 0.02
 )
 
 base_logit <- qlogis(base_p) # convert to the log-odds scale used by the model
@@ -109,7 +124,8 @@ print(sim_grid)
 sim_grid |>
   tt() |>
   style_tt(j= 1:5, align = "llrrr")|>
-  format_tt(digits = 4, num_mark_big = ",", num_fmt = "decimal") |>
+  format_tt(j = 3:4, digits = 4, num_mark_big = ",", num_fmt = "decimal") |>
+  format_tt(j = 5, fn = scales::label_percent(accuracy = 0.1)) |>
   setNames(c("Province", "Gender", "Transit Users", "Total Commuters", "Share"))
 ```
 
@@ -123,5 +139,5 @@ ggplot(sim_grid, aes(x = share, y = fct_reorder(geography, share),
        colour = "Gender") + 
   theme_minimal()
 ```
-## What Pattern Would Count as an Answer?
-#### 
+
+

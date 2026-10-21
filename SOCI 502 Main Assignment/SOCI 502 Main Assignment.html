@@ -63,7 +63,26 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="SOCI 502 Main Assignment_files/libs/clipboard/clipboard.min.js"></script>
@@ -126,29 +145,39 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="dataset" class="level2">
 <h2 class="anchored" data-anchor-id="dataset">Dataset:</h2>
-<p>The dataset that I have selected is Table 98-10-0458-01 from the 2021 Canadian Census. This dataset includes information on Canadians’ choice of commuting mode, duration of commute, time leaving for work, age, and gender, categorized by province/territory.</p>
+<p>The dataset that I have selected is Table 98-10-0458-01 <span class="citation" data-cites="MainModeofCommuting">(<a href="#ref-MainModeofCommuting" role="doc-biblioref">Government of Canada 2021</a>)</span> from the 2021 Canadian Census. This dataset includes information on Canadians’ choice of commuting mode, duration of commute, time leaving for work, age, and gender, categorized by province/territory.</p>
+</section>
+<section id="plans-for-data-story" class="level2">
+<h2 class="anchored" data-anchor-id="plans-for-data-story">Plans for Data Story:</h2>
+<p>I plan to compare transit use of Canadian men and women across all 13 provinces and territories in Canada to see if there are patterns that can be identified, when comparing transit use with total commuters in each province.</p>
+<p>I hypothesize that women across each province will have higher transit use rates than their male counterparts, and that the provinces with the highest rates of transit use will be large provinces with sophisticated transit networks. This will be proven if Women+ transit rates across the 13 Canadian provinces and territories are greater than those of Men+ and if transit rates are highest within “large_tier” provinces and lowest within “small_tier” provinces.</p>
 </section>
 <section id="simulated-code-and-data" class="level2">
 <h2 class="anchored" data-anchor-id="simulated-code-and-data">Simulated Code and Data:</h2>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="do">#### Workspace Setup #### </span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("tidyverse")</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("tidyverse") </span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("dplyr")</span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("knitr")</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("tinytable")</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tinytable)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">723</span>) <span class="co"># makes the simulation reproducible</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Naming simulated objects (note that "provinces" includes both Canadian provinces and territories for simplicity)</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>provinces <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Newfoundland and Labrador"</span>, <span class="st">"Prince Edward Island"</span>, <span class="st">"Nova Scotia"</span>, <span class="st">"New Brunswick"</span>, <span class="st">"Quebec"</span>, <span class="st">"Ontario"</span>, <span class="st">"Manitoba"</span>, <span class="st">"Saskatchewan"</span>, <span class="st">"Alberta"</span>, <span class="st">"British Columbia"</span>, <span class="st">"Yukon"</span>, <span class="st">"Northwest Territories"</span>, <span class="st">"Nunavut"</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Naming simulated objects (note that "provinces" includes both Canadian </span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># provinces and territories for simplicity)</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>provinces <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Newfoundland and Labrador"</span>, <span class="st">"Prince Edward Island"</span>, <span class="st">"Nova Scotia"</span>, </span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="st">"New Brunswick"</span>, <span class="st">"Quebec"</span>, <span class="st">"Ontario"</span>, <span class="st">"Manitoba"</span>, <span class="st">"Saskatchewan"</span>, <span class="st">"Alberta"</span>, </span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">"British Columbia"</span>, <span class="st">"Yukon"</span>, <span class="st">"Northwest Territories"</span>, <span class="st">"Nunavut"</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Rough relative size of each workforce (approx. in thousands, per gender)</span></span>
@@ -181,41 +210,46 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Baseline probability of using transit, set in three simple tiers (based on expectation, not estimates from data)</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Large transit systems (Quebec, Ontario, BC): 8% </span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Medium transit systems (Nova Scotia, Manitoba, Alberta): 4% </span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># All other provinces and territories: 2% </span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>large_tier <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Quebec"</span>, <span class="st">"Ontario"</span>, <span class="st">"British Columbia"</span>)</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>medium_tier <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Nova Scotia"</span>, <span class="st">"Manitoba"</span>, <span class="st">"Alberta"</span>)</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>base_p <span class="ot">&lt;-</span> <span class="fu">case_when</span>(</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  provinces <span class="sc">%in%</span> large_tier  <span class="sc">~</span> <span class="fl">0.08</span>, </span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  provinces <span class="sc">%in%</span> medium_tier <span class="sc">~</span> <span class="fl">0.04</span>, </span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="cn">TRUE</span>                       <span class="sc">~</span> <span class="fl">0.02</span></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>base_logit <span class="ot">&lt;-</span> <span class="fu">qlogis</span>(base_p) <span class="co"># convert to the log-odds scale used by the model</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Baseline probability of using transit, set in three simple tiers (based on </span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># expectation, not estimates from data)</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Large transit systems (Quebec, Ontario, BC): 8% </span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Medium transit systems (Nova Scotia, Manitoba, Alberta): 4% </span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># All other provinces and territories: 2% </span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>large_tier <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Quebec"</span>, <span class="st">"Ontario"</span>, <span class="st">"British Columbia"</span>)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>medium_tier <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Nova Scotia"</span>, <span class="st">"Manitoba"</span>, <span class="st">"Alberta"</span>)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>small_tier <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Yukon"</span>, <span class="st">"Northwest Territories"</span>, <span class="st">"Nunavut"</span>, </span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>                <span class="st">"Prince Edward Island"</span>, <span class="st">"Newfoundland and Labrador"</span>, </span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>                <span class="st">"Saskatchewan"</span>, <span class="st">"New Brunswick"</span>)</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>base_p <span class="ot">&lt;-</span> <span class="fu">case_when</span>(</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  provinces <span class="sc">%in%</span> large_tier  <span class="sc">~</span> <span class="fl">0.08</span>, </span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>  provinces <span class="sc">%in%</span> medium_tier <span class="sc">~</span> <span class="fl">0.04</span>, </span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  provinces <span class="sc">%in%</span> small_tier  <span class="sc">~</span> <span class="fl">0.02</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>base_logit <span class="ot">&lt;-</span> <span class="fu">qlogis</span>(base_p) <span class="co"># convert to the log-odds scale used by the model</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Gender effect on the log-odds scale: women are assumed to be higher on average (+0.25), and the size of the gap varies randomly by province. </span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># This variation is the interaction I want to detect.</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>gender_effect <span class="ot">&lt;-</span> <span class="fl">0.25</span> <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="dv">13</span>, <span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="fl">0.15</span>)</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>sim_grid <span class="ot">&lt;-</span> sim_grid <span class="sc">|&gt;</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">province_id =</span> <span class="fu">match</span>(geography, provinces), </span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">logit_p =</span> base_logit[province_id] <span class="sc">+</span> </span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>      <span class="fu">if_else</span>(gender <span class="sc">==</span> <span class="st">"Women+"</span>, gender_effect[province_id], <span class="dv">0</span>), </span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">p_transit =</span> <span class="fu">plogis</span>(logit_p), </span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">transit =</span> <span class="fu">rbinom</span>(<span class="fu">n</span>(), <span class="at">size =</span> total, <span class="at">prob =</span> p_transit), </span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">share =</span> transit <span class="sc">/</span> total</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span> </span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(geography, gender, transit, total, share)</span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(sim_grid)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Gender effect on the log-odds scale: women are assumed to be higher on average </span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># (+0.25), and the size of the gap varies randomly by province. </span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># This variation is the interaction I want to detect.</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>gender_effect <span class="ot">&lt;-</span> <span class="fl">0.25</span> <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="dv">13</span>, <span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="fl">0.15</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>sim_grid <span class="ot">&lt;-</span> sim_grid <span class="sc">|&gt;</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">province_id =</span> <span class="fu">match</span>(geography, provinces), </span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">logit_p =</span> base_logit[province_id] <span class="sc">+</span> </span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>      <span class="fu">if_else</span>(gender <span class="sc">==</span> <span class="st">"Women+"</span>, gender_effect[province_id], <span class="dv">0</span>), </span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">p_transit =</span> <span class="fu">plogis</span>(logit_p), </span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">transit =</span> <span class="fu">rbinom</span>(<span class="fu">n</span>(), <span class="at">size =</span> total, <span class="at">prob =</span> p_transit), </span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">share =</span> transit <span class="sc">/</span> total</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span> </span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(geography, gender, transit, total, share)</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(sim_grid)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 26 × 5
    geography                 gender transit   total  share
@@ -234,29 +268,289 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(sim_grid, <span class="fu">aes</span>(<span class="at">x =</span> share, <span class="at">y =</span> <span class="fu">fct_reorder</span>(geography, share), <span class="at">colour =</span> gender)) <span class="sc">+</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span> (<span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span> </span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">labels =</span> scales<span class="sc">::</span>percent) <span class="sc">+</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Simulated share of commuters using public transit"</span>, <span class="at">x =</span> <span class="st">"Share of commuters"</span>, <span class="at">y =</span> <span class="st">"Canadian provinces and territories"</span>, <span class="at">colour =</span> <span class="st">"Gender"</span>) <span class="sc">+</span> </span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>sim_grid <span class="sc">|&gt;</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tt</span>() <span class="sc">|&gt;</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">style_tt</span>(<span class="at">j=</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="at">align =</span> <span class="st">"llrrr"</span>)<span class="sc">|&gt;</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">format_tt</span>(<span class="at">j =</span> <span class="dv">3</span><span class="sc">:</span><span class="dv">4</span>, <span class="at">digits =</span> <span class="dv">4</span>, <span class="at">num_mark_big =</span> <span class="st">","</span>, <span class="at">num_fmt =</span> <span class="st">"decimal"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">format_tt</span>(<span class="at">j =</span> <span class="dv">5</span>, <span class="at">fn =</span> scales<span class="sc">::</span><span class="fu">label_percent</span>(<span class="at">accuracy =</span> <span class="fl">0.1</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">setNames</span>(<span class="fu">c</span>(<span class="st">"Province"</span>, <span class="st">"Gender"</span>, <span class="st">"Transit Users"</span>, <span class="st">"Total Commuters"</span>, <span class="st">"Share"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<script src="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.js"></script>
+
+    <script>
+      // Create table-specific functions using external factory
+      const tableFns_4wldypqjapuyykka8gy4 = TinyTable.createTableFunctions("tinytable_4wldypqjapuyykka8gy4");
+      // tinytable span after
+      window.addEventListener('load', function () {
+          var cellsToStyle = [
+            // tinytable style arrays after
+          { positions: [ { i: '26', j: 3 }, { i: '26', j: 4 }, { i: '26', j: 5 } ], css_id: 'tinytable_css_7q6cbjz5whmn2oyvbimu',}, 
+          { positions: [ { i: '1', j: 3 }, { i: '2', j: 3 }, { i: '3', j: 3 }, { i: '4', j: 3 }, { i: '5', j: 3 }, { i: '6', j: 3 }, { i: '7', j: 3 }, { i: '8', j: 3 }, { i: '9', j: 3 }, { i: '10', j: 3 }, { i: '11', j: 3 }, { i: '12', j: 3 }, { i: '13', j: 3 }, { i: '14', j: 3 }, { i: '15', j: 3 }, { i: '16', j: 3 }, { i: '17', j: 3 }, { i: '18', j: 3 }, { i: '19', j: 3 }, { i: '20', j: 3 }, { i: '21', j: 3 }, { i: '22', j: 3 }, { i: '23', j: 3 }, { i: '24', j: 3 }, { i: '25', j: 3 }, { i: '1', j: 4 }, { i: '2', j: 4 }, { i: '3', j: 4 }, { i: '4', j: 4 }, { i: '5', j: 4 }, { i: '6', j: 4 }, { i: '7', j: 4 }, { i: '8', j: 4 }, { i: '9', j: 4 }, { i: '10', j: 4 }, { i: '11', j: 4 }, { i: '12', j: 4 }, { i: '13', j: 4 }, { i: '14', j: 4 }, { i: '15', j: 4 }, { i: '16', j: 4 }, { i: '17', j: 4 }, { i: '18', j: 4 }, { i: '19', j: 4 }, { i: '20', j: 4 }, { i: '21', j: 4 }, { i: '22', j: 4 }, { i: '23', j: 4 }, { i: '24', j: 4 }, { i: '25', j: 4 }, { i: '1', j: 5 }, { i: '2', j: 5 }, { i: '3', j: 5 }, { i: '4', j: 5 }, { i: '5', j: 5 }, { i: '6', j: 5 }, { i: '7', j: 5 }, { i: '8', j: 5 }, { i: '9', j: 5 }, { i: '10', j: 5 }, { i: '11', j: 5 }, { i: '12', j: 5 }, { i: '13', j: 5 }, { i: '14', j: 5 }, { i: '15', j: 5 }, { i: '16', j: 5 }, { i: '17', j: 5 }, { i: '18', j: 5 }, { i: '19', j: 5 }, { i: '20', j: 5 }, { i: '21', j: 5 }, { i: '22', j: 5 }, { i: '23', j: 5 }, { i: '24', j: 5 }, { i: '25', j: 5 } ], css_id: 'tinytable_css_pj31nmcxwbmygwm8h64i',}, 
+          { positions: [ { i: '0', j: 3 }, { i: '0', j: 4 }, { i: '0', j: 5 } ], css_id: 'tinytable_css_4sz8v841ypwjyem8em7h',}, 
+          { positions: [ { i: '26', j: 1 }, { i: '26', j: 2 } ], css_id: 'tinytable_css_dv707uzlectvv1qj69yk',}, 
+          { positions: [ { i: '1', j: 1 }, { i: '2', j: 1 }, { i: '3', j: 1 }, { i: '4', j: 1 }, { i: '5', j: 1 }, { i: '6', j: 1 }, { i: '7', j: 1 }, { i: '8', j: 1 }, { i: '9', j: 1 }, { i: '10', j: 1 }, { i: '11', j: 1 }, { i: '12', j: 1 }, { i: '13', j: 1 }, { i: '14', j: 1 }, { i: '15', j: 1 }, { i: '16', j: 1 }, { i: '17', j: 1 }, { i: '18', j: 1 }, { i: '19', j: 1 }, { i: '20', j: 1 }, { i: '21', j: 1 }, { i: '22', j: 1 }, { i: '23', j: 1 }, { i: '24', j: 1 }, { i: '25', j: 1 }, { i: '1', j: 2 }, { i: '2', j: 2 }, { i: '3', j: 2 }, { i: '4', j: 2 }, { i: '5', j: 2 }, { i: '6', j: 2 }, { i: '7', j: 2 }, { i: '8', j: 2 }, { i: '9', j: 2 }, { i: '10', j: 2 }, { i: '11', j: 2 }, { i: '12', j: 2 }, { i: '13', j: 2 }, { i: '14', j: 2 }, { i: '15', j: 2 }, { i: '16', j: 2 }, { i: '17', j: 2 }, { i: '18', j: 2 }, { i: '19', j: 2 }, { i: '20', j: 2 }, { i: '21', j: 2 }, { i: '22', j: 2 }, { i: '23', j: 2 }, { i: '24', j: 2 }, { i: '25', j: 2 } ], css_id: 'tinytable_css_h20pcm443g9my0nho0dr',}, 
+          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 } ], css_id: 'tinytable_css_48zfnr54508284q8yjcs',}, 
+          ];
+
+          // Loop over the arrays to style the cells
+          cellsToStyle.forEach(function (group) {
+              group.positions.forEach(function (cell) {
+                  tableFns_4wldypqjapuyykka8gy4.styleCell(cell.i, cell.j, group.css_id);
+              });
+          });
+      });
+    </script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.css">
+    <style>
+    /* tinytable css entries after */
+    #tinytable_4wldypqjapuyykka8gy4 td.tinytable_css_7q6cbjz5whmn2oyvbimu, #tinytable_4wldypqjapuyykka8gy4 th.tinytable_css_7q6cbjz5whmn2oyvbimu {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --line-type-bottom: solid; --line-type-left: solid; --line-type-right: solid; --line-type-top: solid; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: right }
+    #tinytable_4wldypqjapuyykka8gy4 td.tinytable_css_pj31nmcxwbmygwm8h64i, #tinytable_4wldypqjapuyykka8gy4 th.tinytable_css_pj31nmcxwbmygwm8h64i { text-align: right }
+    #tinytable_4wldypqjapuyykka8gy4 td.tinytable_css_4sz8v841ypwjyem8em7h, #tinytable_4wldypqjapuyykka8gy4 th.tinytable_css_4sz8v841ypwjyem8em7h {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --line-type-bottom: solid; --line-type-left: solid; --line-type-right: solid; --line-type-top: solid; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: right }
+    #tinytable_4wldypqjapuyykka8gy4 td.tinytable_css_dv707uzlectvv1qj69yk, #tinytable_4wldypqjapuyykka8gy4 th.tinytable_css_dv707uzlectvv1qj69yk {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --line-type-bottom: solid; --line-type-left: solid; --line-type-right: solid; --line-type-top: solid; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+    #tinytable_4wldypqjapuyykka8gy4 td.tinytable_css_h20pcm443g9my0nho0dr, #tinytable_4wldypqjapuyykka8gy4 th.tinytable_css_h20pcm443g9my0nho0dr { text-align: left }
+    #tinytable_4wldypqjapuyykka8gy4 td.tinytable_css_48zfnr54508284q8yjcs, #tinytable_4wldypqjapuyykka8gy4 th.tinytable_css_48zfnr54508284q8yjcs {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --line-type-bottom: solid; --line-type-left: solid; --line-type-right: solid; --line-type-top: solid; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+    </style>
+    <div class="container">
+      <table class="tinytable" id="tinytable_4wldypqjapuyykka8gy4" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+        
+        <thead>
+              <tr>
+                <th scope="col" data-row="0" data-col="1">Province</th>
+                <th scope="col" data-row="0" data-col="2">Gender</th>
+                <th scope="col" data-row="0" data-col="3">Transit Users</th>
+                <th scope="col" data-row="0" data-col="4">Total Commuters</th>
+                <th scope="col" data-row="0" data-col="5">Share</th>
+              </tr>
+        </thead>
+        
+        <tbody>
+                <tr>
+                  <td data-row="1" data-col="1">Newfoundland and Labrador</td>
+                  <td data-row="1" data-col="2">Men+</td>
+                  <td data-row="1" data-col="3">1,863</td>
+                  <td data-row="1" data-col="4">89,529</td>
+                  <td data-row="1" data-col="5">2.1%</td>
+                </tr>
+                <tr>
+                  <td data-row="2" data-col="1">Newfoundland and Labrador</td>
+                  <td data-row="2" data-col="2">Women+</td>
+                  <td data-row="2" data-col="3">1,862</td>
+                  <td data-row="2" data-col="4">96,500</td>
+                  <td data-row="2" data-col="5">1.9%</td>
+                </tr>
+                <tr>
+                  <td data-row="3" data-col="1">Prince Edward Island</td>
+                  <td data-row="3" data-col="2">Men+</td>
+                  <td data-row="3" data-col="3">720</td>
+                  <td data-row="3" data-col="4">35,118</td>
+                  <td data-row="3" data-col="5">2.1%</td>
+                </tr>
+                <tr>
+                  <td data-row="4" data-col="1">Prince Edward Island</td>
+                  <td data-row="4" data-col="2">Women+</td>
+                  <td data-row="4" data-col="3">944</td>
+                  <td data-row="4" data-col="4">37,654</td>
+                  <td data-row="4" data-col="5">2.5%</td>
+                </tr>
+                <tr>
+                  <td data-row="5" data-col="1">Nova Scotia</td>
+                  <td data-row="5" data-col="2">Men+</td>
+                  <td data-row="5" data-col="3">8,366</td>
+                  <td data-row="5" data-col="4">208,050</td>
+                  <td data-row="5" data-col="5">4.0%</td>
+                </tr>
+                <tr>
+                  <td data-row="6" data-col="1">Nova Scotia</td>
+                  <td data-row="6" data-col="2">Women+</td>
+                  <td data-row="6" data-col="3">6,949</td>
+                  <td data-row="6" data-col="4">234,297</td>
+                  <td data-row="6" data-col="5">3.0%</td>
+                </tr>
+                <tr>
+                  <td data-row="7" data-col="1">New Brunswick</td>
+                  <td data-row="7" data-col="2">Men+</td>
+                  <td data-row="7" data-col="3">3,388</td>
+                  <td data-row="7" data-col="4">167,002</td>
+                  <td data-row="7" data-col="5">2.0%</td>
+                </tr>
+                <tr>
+                  <td data-row="8" data-col="1">New Brunswick</td>
+                  <td data-row="8" data-col="2">Women+</td>
+                  <td data-row="8" data-col="3">4,517</td>
+                  <td data-row="8" data-col="4">189,127</td>
+                  <td data-row="8" data-col="5">2.4%</td>
+                </tr>
+                <tr>
+                  <td data-row="9" data-col="1">Quebec</td>
+                  <td data-row="9" data-col="2">Men+</td>
+                  <td data-row="9" data-col="3">144,714</td>
+                  <td data-row="9" data-col="4">1,815,278</td>
+                  <td data-row="9" data-col="5">8.0%</td>
+                </tr>
+                <tr>
+                  <td data-row="10" data-col="1">Quebec</td>
+                  <td data-row="10" data-col="2">Women+</td>
+                  <td data-row="10" data-col="3">150,227</td>
+                  <td data-row="10" data-col="4">1,921,510</td>
+                  <td data-row="10" data-col="5">7.8%</td>
+                </tr>
+                <tr>
+                  <td data-row="11" data-col="1">Ontario</td>
+                  <td data-row="11" data-col="2">Men+</td>
+                  <td data-row="11" data-col="3">281,395</td>
+                  <td data-row="11" data-col="4">3,515,798</td>
+                  <td data-row="11" data-col="5">8.0%</td>
+                </tr>
+                <tr>
+                  <td data-row="12" data-col="1">Ontario</td>
+                  <td data-row="12" data-col="2">Women+</td>
+                  <td data-row="12" data-col="3">368,863</td>
+                  <td data-row="12" data-col="4">3,185,667</td>
+                  <td data-row="12" data-col="5">11.6%</td>
+                </tr>
+                <tr>
+                  <td data-row="13" data-col="1">Manitoba</td>
+                  <td data-row="13" data-col="2">Men+</td>
+                  <td data-row="13" data-col="3">11,062</td>
+                  <td data-row="13" data-col="4">280,457</td>
+                  <td data-row="13" data-col="5">3.9%</td>
+                </tr>
+                <tr>
+                  <td data-row="14" data-col="1">Manitoba</td>
+                  <td data-row="14" data-col="2">Women+</td>
+                  <td data-row="14" data-col="3">18,794</td>
+                  <td data-row="14" data-col="4">306,114</td>
+                  <td data-row="14" data-col="5">6.1%</td>
+                </tr>
+                <tr>
+                  <td data-row="15" data-col="1">Saskatchewan</td>
+                  <td data-row="15" data-col="2">Men+</td>
+                  <td data-row="15" data-col="3">4,740</td>
+                  <td data-row="15" data-col="4">235,507</td>
+                  <td data-row="15" data-col="5">2.0%</td>
+                </tr>
+                <tr>
+                  <td data-row="16" data-col="1">Saskatchewan</td>
+                  <td data-row="16" data-col="2">Women+</td>
+                  <td data-row="16" data-col="3">8,281</td>
+                  <td data-row="16" data-col="4">251,087</td>
+                  <td data-row="16" data-col="5">3.3%</td>
+                </tr>
+                <tr>
+                  <td data-row="17" data-col="1">Alberta</td>
+                  <td data-row="17" data-col="2">Men+</td>
+                  <td data-row="17" data-col="3">40,169</td>
+                  <td data-row="17" data-col="4">999,120</td>
+                  <td data-row="17" data-col="5">4.0%</td>
+                </tr>
+                <tr>
+                  <td data-row="18" data-col="1">Alberta</td>
+                  <td data-row="18" data-col="2">Women+</td>
+                  <td data-row="18" data-col="3">54,140</td>
+                  <td data-row="18" data-col="4">1,010,293</td>
+                  <td data-row="18" data-col="5">5.4%</td>
+                </tr>
+                <tr>
+                  <td data-row="19" data-col="1">British Columbia</td>
+                  <td data-row="19" data-col="2">Men+</td>
+                  <td data-row="19" data-col="3">82,627</td>
+                  <td data-row="19" data-col="4">1,030,103</td>
+                  <td data-row="19" data-col="5">8.0%</td>
+                </tr>
+                <tr>
+                  <td data-row="20" data-col="1">British Columbia</td>
+                  <td data-row="20" data-col="2">Women+</td>
+                  <td data-row="20" data-col="3">119,381</td>
+                  <td data-row="20" data-col="4">1,196,369</td>
+                  <td data-row="20" data-col="5">10.0%</td>
+                </tr>
+                <tr>
+                  <td data-row="21" data-col="1">Yukon</td>
+                  <td data-row="21" data-col="2">Men+</td>
+                  <td data-row="21" data-col="3">187</td>
+                  <td data-row="21" data-col="4">9,218</td>
+                  <td data-row="21" data-col="5">2.0%</td>
+                </tr>
+                <tr>
+                  <td data-row="22" data-col="1">Yukon</td>
+                  <td data-row="22" data-col="2">Women+</td>
+                  <td data-row="22" data-col="3">285</td>
+                  <td data-row="22" data-col="4">10,018</td>
+                  <td data-row="22" data-col="5">2.8%</td>
+                </tr>
+                <tr>
+                  <td data-row="23" data-col="1">Northwest Territories</td>
+                  <td data-row="23" data-col="2">Men+</td>
+                  <td data-row="23" data-col="3">209</td>
+                  <td data-row="23" data-col="4">9,572</td>
+                  <td data-row="23" data-col="5">2.2%</td>
+                </tr>
+                <tr>
+                  <td data-row="24" data-col="1">Northwest Territories</td>
+                  <td data-row="24" data-col="2">Women+</td>
+                  <td data-row="24" data-col="3">336</td>
+                  <td data-row="24" data-col="4">10,523</td>
+                  <td data-row="24" data-col="5">3.2%</td>
+                </tr>
+                <tr>
+                  <td data-row="25" data-col="1">Nunavut</td>
+                  <td data-row="25" data-col="2">Men+</td>
+                  <td data-row="25" data-col="3">182</td>
+                  <td data-row="25" data-col="4">10,369</td>
+                  <td data-row="25" data-col="5">1.8%</td>
+                </tr>
+                <tr>
+                  <td data-row="26" data-col="1">Nunavut</td>
+                  <td data-row="26" data-col="2">Women+</td>
+                  <td data-row="26" data-col="3">270</td>
+                  <td data-row="26" data-col="4">10,750</td>
+                  <td data-row="26" data-col="5">2.5%</td>
+                </tr>
+        </tbody>
+      </table>
+    </div>
+<!-- hack to avoid NA insertion in last line -->
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(sim_grid, <span class="fu">aes</span>(<span class="at">x =</span> share, <span class="at">y =</span> <span class="fu">fct_reorder</span>(geography, share), </span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>                     <span class="at">colour =</span> gender)) <span class="sc">+</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span> (<span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span> </span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">labels =</span> scales<span class="sc">::</span>percent) <span class="sc">+</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Simulated share of commuters using public transit"</span>, </span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Share of commuters"</span>, <span class="at">y =</span> <span class="st">"Canadian provinces and territories"</span>, </span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">colour =</span> <span class="st">"Gender"</span>) <span class="sc">+</span> </span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="SOCI-502-Main-Assignment_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="SOCI-502-Main-Assignment_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
-</section>
-<section id="what-pattern-would-count-as-an-answer" class="level2">
-<h2 class="anchored" data-anchor-id="what-pattern-would-count-as-an-answer">What Pattern Would Count as an Answer?</h2>
-<section id="section" class="level4">
-<h4 class="anchored" data-anchor-id="section"></h4>
-</section>
+
 </section>
 </section>
 
-</main>
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-tinytable" class="csl-entry" role="listitem">
+Arel-Bundock, Vincent. 2026. <em>Tinytable: Simple and Configurable Tables in ’HTML’, ’LaTeX’, ’Markdown’, ’Word’, ’PNG’, ’PDF’, and ’Typst’ Formats</em>. <a href="https://doi.org/10.32614/CRAN.package.tinytable">https://doi.org/10.32614/CRAN.package.tinytable</a>.
+</div>
+<div id="ref-MainModeofCommuting" class="csl-entry" role="listitem">
+Government of Canada. 2021. <span>“Main Mode of Commuting by Commuting Duration, Time Leaving for Work, Age and Gender: Canada, Provinces and Territories, Census Divisions and Census Subdivisions.”</span> https://doi.org/<a href="https://doi.org/10.25318/9810045801-eng">https://doi.org/10.25318/9810045801-eng</a>.
+</div>
+<div id="ref-citeR" class="csl-entry" role="listitem">
+R Core Team. 2024. <em>R: A Language and Environment for Statistical Computing</em>. R Foundation for Statistical Computing. <a href="https://www.R-project.org/">https://www.R-project.org/</a>.
+</div>
+<div id="ref-tidyverse" class="csl-entry" role="listitem">
+Wickham, Hadley, Mara Averick, Jennifer Bryan, et al. 2019. <span>“Welcome to the <span class="nocase">tidyverse</span>.”</span> <em>Journal of Open Source Software</em> 4 (43): 1686. <a href="https://doi.org/10.21105/joss.01686">https://doi.org/10.21105/joss.01686</a>.
+</div>
+<div id="ref-dplyr" class="csl-entry" role="listitem">
+Wickham, Hadley, Romain François, Lionel Henry, Kirill Müller, and Davis Vaughan. 2026. <em>Dplyr: A Grammar of Data Manipulation</em>. <a href="https://doi.org/10.32614/CRAN.package.dplyr">https://doi.org/10.32614/CRAN.package.dplyr</a>.
+</div>
+</div></section></div></main>
 <!-- /main column -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
